@@ -1,12 +1,16 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 
 public class PlaintextFileHandler {
 
 	private static int THREE_CHARS = 3;
 	private String myFilename;
 	private BufferedReader myBufferedReader = null;
+	private BufferedWriter myBufferedWriter = null;
 	
 	public PlaintextFileHandler(String filename) {
 		myFilename = filename;
@@ -24,6 +28,15 @@ public class PlaintextFileHandler {
 		if(myBufferedReader != null) {
 			try {
 				myBufferedReader.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if(myBufferedWriter != null) {
+			try {
+				myBufferedWriter.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -150,6 +163,77 @@ public class PlaintextFileHandler {
 		 }
 	}
 	
+	public char longToChar(long in) {
+		switch ( (int)in )
+		 {
+		   case 0:
+		     return ' ';
+		   case 1:
+		     return 'A';
+		   case 2:
+		     return 'B';
+		   case 3:
+		     return 'C';
+		   case 4:
+		     return 'D';
+		   case 5:
+		     return 'E';
+		   case 6:
+		     return 'F';
+		   case 7:
+		     return 'G';
+		   case 8:
+		     return 'H';
+		   case 9:
+		     return 'I';
+		   case 10:
+		     return 'J';
+		   case 11:
+		     return 'K';
+		   case 12:
+		     return 'L';
+		   case 13:
+		     return 'M';
+		   case 14:
+		     return 'N';
+		   case 15:
+		     return 'O';
+		   case 16:
+		     return 'P';
+		   case 17:
+		     return 'Q';
+		   case 18:
+		     return 'R';
+		   case 19:
+		     return 'S';
+		   case 20:
+		     return 'T';
+		   case 21:
+		     return 'U';
+		   case 22:
+		     return 'V';
+		   case 23:
+		     return 'W';
+		   case 24:
+		     return 'X';
+		   case 25:
+		     return 'Y';
+		   case 26:
+		     return 'Z';
+		   case 27:
+		     return ',';
+		   case 28:
+		     return '.';
+		   case 29:
+		     return '\n';
+		   case 30:
+		     return '\r';
+
+		   default:
+		     throw new java.lang.IllegalArgumentException("Argument must be be on interval [0, 30]");
+		   }
+	}
+	
 	//Make up the letters that will be in the enumeration
 	public static long Space = 0;
 	public static long A = 1;
@@ -182,4 +266,19 @@ public class PlaintextFileHandler {
 	public static long Period = 28;
 	public static long NewLine = 29;
 	public static long CarriageReturn = 30;
+
+	public void writeNextLong(long in) throws IOException {
+		if(myBufferedWriter == null) {
+			myBufferedWriter = new BufferedWriter(new FileWriter(myFilename));
+		}
+		//start at 2, then 1, then 0, then break
+		for(int i = THREE_CHARS - 1; i >= 0; i--) {
+			long currentShift = (long) Math.pow(100.0, (double) i);
+			long current = in / currentShift;
+			in %= currentShift;
+			
+			myBufferedWriter.write(longToChar(current));
+		}
+		
+	}
 }
