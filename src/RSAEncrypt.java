@@ -38,7 +38,7 @@ public class RSAEncrypt {
 			System.exit(-1);
 		}
 		
-		
+		System.out.println("Success! See " + args[0].split("\\.")[0] + ".enc" + " for the encrypted message.");
 	}
 	
 	public static void readKeyFile(String filename) throws IOException {
@@ -55,6 +55,10 @@ public class RSAEncrypt {
 		splitLine = in.readLine().split(" ");
 		if(splitLine[0].equals("n")) {
 			n = new BigInteger(splitLine[2]);
+			if(n.compareTo(BigInteger.valueOf((long)303030)) <= 0) {
+				System.err.println("n is not greater than max encoded value. Please provide a different key file");
+				System.exit(-1);
+			}
 		} else {
 			System.err.println("Invalid key file, did not find n.");
 			System.exit(-1);
