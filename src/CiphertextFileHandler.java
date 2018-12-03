@@ -1,15 +1,14 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.Scanner;
 
 public class CiphertextFileHandler {
 	private String myFilename;
 	private BufferedWriter myBufferedWriter = null;
-	private BufferedReader myBufferedReader = null;
+	private Scanner myScanner = null;
 	
 	public CiphertextFileHandler(String filename) {
 		myFilename = filename;
@@ -20,11 +19,10 @@ public class CiphertextFileHandler {
 			myBufferedWriter = new BufferedWriter(new FileWriter(myFilename));
 		}
 		
-		myBufferedWriter.write(in.toString());
-		myBufferedWriter.newLine();
+		myBufferedWriter.write(in.toString() + " ");
 	}
 	
-	public void close() {
+	public void close() throws IOException {
 		if(myBufferedWriter != null) {
 			try {
 				myBufferedWriter.close();
@@ -33,27 +31,21 @@ public class CiphertextFileHandler {
 				e.printStackTrace();
 			}
 		}
-		if(myBufferedReader != null) {
-			try {
-				myBufferedReader.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if(myScanner != null) {
+			myScanner.close();
 		}
 	}
 
 	public BigInteger readNextBigInt() throws IOException {
-		if(myBufferedReader == null) {
-			myBufferedReader = new BufferedReader(new FileReader(myFilename));
+		if(myScanner == null) {
+			myScanner = new Scanner(new File(myFilename));
+			
 		}
 		
-		String currentLine = myBufferedReader.readLine();
-		
-		if(currentLine == null) {
+		if(myScanner.hasNextBigInteger()) {
+			return myScanner.nextBigInteger();
+		}
+		else
 			return null;
-		}
-		
-		return new BigInteger(currentLine);
 	}
 }

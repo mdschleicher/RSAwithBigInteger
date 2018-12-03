@@ -1,15 +1,13 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigInteger;
 
 public class PlaintextFileHandler {
 
 	private static int THREE_CHARS = 3;
 	private String myFilename;
-	private BufferedReader myBufferedReader = null;
+	private FileReader myFileReader = null;
 	private BufferedWriter myBufferedWriter = null;
 	
 	public PlaintextFileHandler(String filename) {
@@ -17,17 +15,54 @@ public class PlaintextFileHandler {
 	}
 	
 	public long readThreeMoreLetters() throws IOException {
-		if(myBufferedReader == null) {
-			myBufferedReader = new BufferedReader(new FileReader(myFilename));
+		if(myFileReader == null) {
+			myFileReader = new FileReader(myFilename);
 		}
-		char[] threeChars = new char[THREE_CHARS];
-		return threeCharToLong(threeChars, myBufferedReader.read(threeChars, 0, THREE_CHARS));
+		
+		long result = 0;
+		int currentChar = -1;
+		for(int i = 0; i <THREE_CHARS; i++) {
+			
+			currentChar = myFileReader.read();
+			
+			if(currentChar == -1) {
+				if(i == 0)
+					return -1;
+				
+				//shift it over so we have trailing extra spaces instead of leading extra space
+				for(;i <THREE_CHARS; i++) {
+					result = (result * 100) + Space;
+				}
+				return result;
+			}
+			
+			long currentResult = charToLong((char)currentChar);
+			
+			//skip any non A-Z or Space
+			while(currentResult == -1) {
+				currentChar = myFileReader.read();
+				
+				if(currentChar == -1) {
+					//shift it over so we have trailing extra spaces instead of leading extra space
+					for(;i <THREE_CHARS; i++) {
+						result = (result * 100) + Space;
+					}
+					return result;
+				}
+				
+				currentResult = charToLong((char)currentChar);
+			}
+			
+			result = (result * 100) + charToLong((char)currentChar);
+		}
+		
+		return result;
 	}
 	
 	public void close() {
-		if(myBufferedReader != null) {
+		if(myFileReader != null) {
 			try {
-				myBufferedReader.close();
+				myFileReader.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -44,22 +79,6 @@ public class PlaintextFileHandler {
 		}
 	}
 	
-	private long threeCharToLong(char[] threeChar, int size) {
-		if(size < 0) {
-			return size;
-		}
-		
-		long result = 0;
-		
-		for(int i = 0; i <size; i++) {
-			result = (result * 100) + charToLong(threeChar[i]);
-		}
-		
-		//shift over so its tailing spaces not leading spaces on the last number
-		result *= Math.pow(100.0, 3.0 - size);
-		
-		return result;
-	}
 	
 	private long charToLong(char in) {
 		 // substitute the old char for our CASCII value
@@ -142,24 +161,12 @@ public class PlaintextFileHandler {
 
 		   case 'Z':
 		     return Z;
-		   case ',':
-		     return Comma;
-
-		   case '.':
-		     return Period;
-
-		   case ' ':
-		     return Space;
 		     
-		   case '\n':
-		   	 return NewLine;
-		   	 
-		   case '\r':
-			   return CarriageReturn;
+		   case ' ':
+			 return Space;
 
 		   default:
-		     throw new java.lang.IllegalArgumentException(
-		         "Character must be upper case A-Z or { '\'', ':', ',', '.', '?', ' '} -- found: " + in);
+		     return -1;
 		 }
 	}
 	
@@ -167,105 +174,94 @@ public class PlaintextFileHandler {
 		switch ( (int)in )
 		 {
 		   case 0:
-		     return ' ';
-		   case 1:
 		     return 'A';
-		   case 2:
+		   case 1:
 		     return 'B';
-		   case 3:
+		   case 2:
 		     return 'C';
-		   case 4:
+		   case 3:
 		     return 'D';
-		   case 5:
+		   case 4:
 		     return 'E';
-		   case 6:
+		   case 5:
 		     return 'F';
-		   case 7:
+		   case 6:
 		     return 'G';
-		   case 8:
+		   case 7:
 		     return 'H';
-		   case 9:
+		   case 8:
 		     return 'I';
-		   case 10:
+		   case 9:
 		     return 'J';
-		   case 11:
+		   case 10:
 		     return 'K';
-		   case 12:
+		   case 11:
 		     return 'L';
-		   case 13:
+		   case 12:
 		     return 'M';
-		   case 14:
+		   case 13:
 		     return 'N';
-		   case 15:
+		   case 14:
 		     return 'O';
-		   case 16:
+		   case 15:
 		     return 'P';
-		   case 17:
+		   case 16:
 		     return 'Q';
-		   case 18:
+		   case 17:
 		     return 'R';
-		   case 19:
+		   case 18:
 		     return 'S';
-		   case 20:
+		   case 19:
 		     return 'T';
-		   case 21:
+		   case 20:
 		     return 'U';
-		   case 22:
+		   case 21:
 		     return 'V';
-		   case 23:
+		   case 22:
 		     return 'W';
-		   case 24:
+		   case 23:
 		     return 'X';
-		   case 25:
+		   case 24:
 		     return 'Y';
-		   case 26:
+		   case 25:
 		     return 'Z';
-		   case 27:
-		     return ',';
-		   case 28:
-		     return '.';
-		   case 29:
-		     return '\n';
-		   case 30:
-		     return '\r';
+		   case 26:
+			 return ' ';
+
 
 		   default:
-		     throw new java.lang.IllegalArgumentException("Argument must be be on interval [0, 30]");
+		     throw new java.lang.IllegalArgumentException("Argument must be be on interval [0, 26]");
 		   }
 	}
 	
 	//Make up the letters that will be in the enumeration
-	public static long Space = 0;
-	public static long A = 1;
-	public static long B = 2;
-	public static long C = 3;
-	public static long D = 4;
-	public static long E = 5;
-	public static long F = 6;
-	public static long G = 7;
-	public static long H = 8;
-	public static long I = 9;
-	public static long J = 10;
-	public static long K = 11;
-	public static long L = 12;
-	public static long M = 13;
-	public static long N = 14;
-	public static long O = 15;
-	public static long P = 16;
-	public static long Q = 17;
-	public static long R = 18;
-	public static long S = 19;
-	public static long T = 20;
-	public static long U = 21;
-	public static long V = 22;
-	public static long W = 23;
-	public static long X = 24;
-	public static long Y = 25;
-	public static long Z = 26;
-	public static long Comma = 27;
-	public static long Period = 28;
-	public static long NewLine = 29;
-	public static long CarriageReturn = 30;
+	public static long A = 0;
+	public static long B = 1;
+	public static long C = 2;
+	public static long D = 3;
+	public static long E = 4;
+	public static long F = 5;
+	public static long G = 6;
+	public static long H = 7;
+	public static long I = 8;
+	public static long J = 9;
+	public static long K = 10;
+	public static long L = 11;
+	public static long M = 12;
+	public static long N = 13;
+	public static long O = 14;
+	public static long P = 15;
+	public static long Q = 16;
+	public static long R = 17;
+	public static long S = 18;
+	public static long T = 19;
+	public static long U = 20;
+	public static long V = 21;
+	public static long W = 22;
+	public static long X = 23;
+	public static long Y = 24;
+	public static long Z = 25;
+	public static long Space = 26;
 
 	public void writeNextLong(long in) throws IOException {
 		if(myBufferedWriter == null) {

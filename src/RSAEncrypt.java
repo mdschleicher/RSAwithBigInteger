@@ -55,7 +55,7 @@ public class RSAEncrypt {
 		splitLine = in.readLine().split(" ");
 		if(splitLine[0].equals("n")) {
 			n = new BigInteger(splitLine[2]);
-			if(n.compareTo(BigInteger.valueOf((long)303030)) <= 0) {
+			if(n.compareTo(BigInteger.valueOf((long)262626)) <= 0) {
 				System.err.println("n is not greater than max encoded value. Please provide a different key file");
 				System.exit(-1);
 			}
